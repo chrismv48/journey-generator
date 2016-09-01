@@ -26,6 +26,7 @@ export default class LocationSelect extends Component {
       continent: null,
       country_code: null
     };
+    console.log(locationFilters);
     this.props.applyFilters(locationFilters);
   }
 
