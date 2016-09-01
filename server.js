@@ -1,32 +1,47 @@
-var express = require('express');
-var webpackDevMiddleware = require('webpack-dev-middleware');
-var webpackHotMiddleware = require("webpack-hot-middleware");
-var webpack = require('webpack');
-var webpackConfig = require('./webpack.config.js');
-var app = express();
+/* eslint no-console: 0 */
 
-var compiler = webpack(webpackConfig);
+const path = require('path');
+const express = require('express');
+const webpack = require('webpack');
+const webpackMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const config = require('./webpack.config.js');
 
-app.use(express.static(__dirname + '/build'));
+const isDeveloping = process.env.NODE_ENV !== 'production';
+const port = isDeveloping ? 3000 : process.env.PORT;
+const app = express();
 
-//app.use(webpackDevMiddleware(compiler, {
-//  hot: true,
-//  filename: 'bundle.js',
-//  publicPath: '/build/',
-//  stats: {
-//    colors: true
-//  },
-//  historyApiFallback: true
-//}));
-//
-//app.use(webpackHotMiddleware(compiler, {
-//  log: console.log,
-//  path: '/__webpack_hmr',
-//  heartbeat: 10 * 1000,
-//}));
+if (isDeveloping) {
+  const compiler = webpack(config);
+  const middleware = webpackMiddleware(compiler, {
+    publicPath: config.output.publicPath,
+    contentBase: 'src',
+    stats: {
+      colors: true,
+      hash: false,
+      timings: true,
+      chunks: false,
+      chunkModules: false,
+      modules: false
+    }
+  });
 
-var server = app.listen(3000, function() {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log('Journey Generator is running at http://%s:%s', host, port);
+  app.use(middleware);
+  app.use(webpackHotMiddleware(compiler));
+  app.get('*', function response(req, res) {
+    res.write(middleware.fileSystem.readFileSync(path.join(__dirname, 'build/index.html')));
+    res.end();
+  });
+} else {
+  app.use(express.static(__dirname + '/build'));
+  app.get('*', function response(req, res) {
+    res.sendFile(path.join(__dirname, 'build/index.html'));
+  });
+}
+
+app.listen(port, '0.0.0.0', function onStart(err) {
+  if (err) {
+    console.log(err);
+  }
+  console.info('==> 🌎 Listening on port %s. Open up http://0.0.0.0:%s/ in your browser.', port, port);
 });

@@ -5,10 +5,11 @@ import _ from 'lodash';
 import update from 'react-addons-update';
 import ColumnChooserModal from './ColumnChooserModal';
 import LocationSelect from './LocationSelect';
-require('rc-slider/assets/index.css');
+import Dimensions from 'react-dimensions'
+import Ratings from './Ratings'
+
 var Rcslider = require('rc-slider');
 const qs = require('qs');
-
 
 const getLocationOptions = () => {
   return fetch('http://127.0.0.1:5000/locations')
@@ -38,6 +39,18 @@ const SortableHeader = ({onSortChange, field, sortDir, children}) => (
     {children} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
   </a>
 );
+
+class MyComponent extends React.Component {
+  render() {
+    return (
+    <div
+      containerWidth={this.props.containerWidth}
+      containerHeight={this.props.containerHeight}
+    >
+    </div>
+    )
+  }
+}
 
 const FilterLabels = ({filters}) => {
   console.log('filter labels');
@@ -297,10 +310,11 @@ export default class ResultsContainer extends Component {
   render() {
     return (
       <div>
+        <Ratings />
         <div>
           <div style={{width:"40%"}}>
             <LocationSelect
-              locationFilters={_.pick(this.state.filters, ["city_id", "country", "continent"])}
+              locationFilters={_.pick(this.state.filters, ["city_id", "country_code", "continent"])}
               applyFilters={this.applyFilters}
             />
           </div>
@@ -338,17 +352,18 @@ export default class ResultsContainer extends Component {
             }
           </FormGroup>
         </ColumnChooserModal>
-        {!_.isEmpty(_.omit(this.state.filters, ["city_id", "continent", "country"])) ?
+        {!_.isEmpty(_.omit(this.state.filters, ["city_id", "continent", "country_code"])) ?
           <FilterLabels
-            filters={_.omit(this.state.filters, ["city_id", "continent", "country"])}
+            filters={_.omit(this.state.filters, ["city_id", "continent", "country_code"])}
           />
           : null}
-        <div>
+        <div style={{width: "100%"}}>
+          {console.log(this.props.containerWidth)}
           <Table
             rowsCount={this.state.destinations.length}
             rowHeight={50}
             headerHeight={80}
-            width={1100}
+            width={this.props.containerWidth || 1100 }
             height={700}>
             {this.state.tableData.map((columnData, index) => {
               if (columnData.isVisible) {

@@ -24,7 +24,7 @@ export default class LocationSelect extends Component {
     const locationFilters = locationString ? this.convertLocationStringToFilters(locationString) : {
       city_id: null,
       continent: null,
-      country: null
+      country_code: null
     };
     this.props.applyFilters(locationFilters);
   }

@@ -1,12 +1,16 @@
 {
   "name": "journey-generator",
   "version": "0.0.1",
-  "main": "src/main.js",
+  "main": "server.js",
   "scripts": {
-    "compile": "webpack",
-    "start": "webpack-dev-server --content-base=build --hot --inline --watch"
+    "test": "",
+    "start": "node server",
+    "build": "rimraf dist && cross-env NODE_ENV=production webpack --config ./webpack.production.config.js --progress --profile --colors",
+    "eslint": "eslint .",
+    "jscs": "jscs ."
   },
   "dependencies": {
+    "autoprefixer": "^6.4.0",
     "babel-core": "^6.9.1",
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.5.0",
@@ -21,6 +25,7 @@
     "react-addons-update": "^15.3.1",
     "react-bootstrap": "^0.30.3",
     "react-burger-menu": "^1.10.4",
+    "react-dimensions": "^1.3.0",
     "react-dom": "^15.0.1",
     "react-router": "^2.7.0",
     "react-select": "1.0.0-beta14",
@@ -31,7 +36,20 @@
   },
   "devDependencies": {
     "babel-cli": "^6.14.0",
+    "babel-eslint": "^6.1.2",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-react-hmre": "^1.1.1",
+    "cross-env": "^2.0.1",
     "css-loader": "^0.24.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "html-webpack-plugin": "^2.22.0",
+    "jscs": "^3.0.7",
+    "jsdom": "^9.4.5",
+    "json-loader": "^0.5.4",
+    "postcss-loader": "^0.11.0",
+    "radium": "^0.18.1",
+    "react-transform-hmr": "^1.0.4",
+    "stats-webpack-plugin": "^0.4.2",
     "style-loader": "^0.13.1"
   }
 }

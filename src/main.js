@@ -7,6 +7,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, browserHistory } from 'react-router';
 
+// CSS
+import 'react-select/dist/react-select.css';
+import 'fixed-data-table/dist/fixed-data-table.css';
+import 'rc-slider/assets/index.css';
+import './base.css';
+
 // Routes
 import Routes from './Routes';
 
