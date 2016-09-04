@@ -61,8 +61,7 @@ export default class LocationSelect extends Component {
 
   render() {
     return (
-      <div>
-        <h4>
+        <h4 style={{marginTop:24}}>
           <Select.Async
             name="location-select"
             simpleValue
@@ -71,10 +70,9 @@ export default class LocationSelect extends Component {
             value={this.getSelectedLocations()}
             onChange={this.onLocationSelectChange}
             multi
-            placeholder="Search for cities, countries, or continents!"
+            placeholder="Filter by cities, countries, or continents!"
           />
         </h4>
-      </div>
     )
   }
 }

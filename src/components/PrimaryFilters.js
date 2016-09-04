@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import Ratings from './Ratings';
 import LocationSelect from './LocationSelect';
+import { Grid, Row, Col } from 'react-bootstrap'
 import _ from 'lodash';
 require('rc-slider/assets/index.css');
 var Rcslider = require('rc-slider');
@@ -22,10 +23,10 @@ export default class PrimaryFilters extends Component {
     super(props);
   }
 
-  applySliderFilter(field, gte, lte) {
+  applySliderFilter(field, gte, lte, fetchDestinations=true) {
     const newFilters = {[field]: [`gte;${gte}`, `lte;${lte}`]};
     //this.setState({filters: {...this.state.filters, ...newFilters}}, this.fetchDestinations);
-    this.props.applyFilters(newFilters)
+    this.props.applyFilters(newFilters, fetchDestinations)
   }
 
   render() {
@@ -37,17 +38,19 @@ export default class PrimaryFilters extends Component {
             applyFilters={this.props.applyFilters}
           />
         </div>
-        <Ratings
-          applyFilters={this.props.applyFilters}
-          field="attractions"
-        />
-        <Ratings
-          field="foo"
-          interactive={false}
-          defaultRating={3}
-          selectedColor="green"
-          glyph="usd"
-        />
+        <Grid>
+          <Row>
+            <Col sm={1}>
+              <h4 style={{align:"right"}}>Attractions</h4>
+            </Col>
+            <Col sm={2}>
+              <Ratings
+                applyFilters={this.props.applyFilters}
+                field="attractions"
+              />
+            </Col>
+          </Row>
+        </Grid>
         <div style={{width:"10%", padding: 15}}>
           <Rcslider
             min={1}

@@ -12,6 +12,7 @@ import 'react-select/dist/react-select.css';
 import 'fixed-data-table/dist/fixed-data-table.css';
 import 'rc-slider/assets/index.css';
 import './base.css';
+require('font-awesome/css/font-awesome.css');
 
 // Routes
 import Routes from './Routes';

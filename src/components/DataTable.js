@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import { Table, Column, Cell} from 'fixed-data-table';
-import { Checkbox, FormGroup, Button } from 'react-bootstrap';
+import { Checkbox, FormGroup, Button, Row, Col } from 'react-bootstrap';
 import update from 'react-addons-update';
 import _ from 'lodash';
 import ColumnChooserModal from './ColumnChooserModal';
+import FilterLabels from './FilterLabels';
 import Dimensions from 'react-dimensions'
+import Ratings from './Ratings';
+import tableData from './TableData'
+require('rc-slider/assets/index.css');
+var Rcslider = require('rc-slider');
 
 class IndexCell extends Component {
   render() {
@@ -23,16 +28,34 @@ class IndexCell extends Component {
 class SortHeaderCell extends Component {
   render() {
     var {onSortChange, field, sortDir, children, ...props} = this.props;
+    let [label, filter] = React.Children.toArray(children);
     return (
       <Cell {...props}>
         <a onClick={() => onSortChange(field)}>
-          {children} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
+          {label} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
         </a>
+        {filter}
       </Cell>
     )
   }
 }
 
+class RatingCell extends Component {
+  render() {
+    var {rowIndex, iconName, selectedColor, field, data, ...props} = this.props;
+    return (
+      <Cell {...props}>
+        <Ratings
+          field={field}
+          iconName={iconName}
+          interactive={false}
+          staticRating={data[rowIndex][field]}
+          selectedColor={selectedColor}
+        />
+      </Cell>
+    )
+  }
+}
 
 export default class DataTable extends Component {
 
@@ -40,104 +63,11 @@ export default class DataTable extends Component {
     super(props);
 
     this.onSortChange = this.onSortChange.bind(this);
+    this.generateTableColumns = this.generateTableColumns.bind(this);
 
     this.state = {
       showColumnChooserModal: false,
-      tableData: [
-        {
-          header: "Name",
-          label: "Name",
-          width: 200,
-          isVisible: true,
-          fixed: true,
-          cellContent: (props) => {
-            return (
-              <Cell {...props}>
-                {this.props.destinations[props.rowIndex].city_name}, {this.props.destinations[props.rowIndex].country_name}
-              </Cell>
-            )
-          }
-        },
-        {
-          header: () => {
-            return (
-              <SortHeaderCell
-                onSortChange={this.onSortChange}
-                sortDir={this.getSortDir("weather_index")}
-                field="weather_index"
-              >
-                Weather Index
-              </SortHeaderCell>
-            )
-          },
-          label: "Weather Index",
-          width: 100,
-          isVisible: true,
-          fixed: false,
-          align: "center",
-          cellContent: (props) => {
-            return (
-              <IndexCell
-                data={this.props.destinations}
-                field="weather_index"
-                {...props}
-              />
-            )
-          }
-        },
-        {
-          header: () => {
-            return (
-              <SortHeaderCell
-                onSortChange={this.onSortChange}
-                sortDir={this.getSortDir("safety_score")}
-                field="safety_score"
-              >
-                Safety Score
-              </SortHeaderCell>
-            )
-          },
-          label: "Safety Score",
-          width: 100,
-          isVisible: true,
-          fixed: false,
-          align: "center",
-          cellContent: (props) => {
-            return (
-              <IndexCell
-                data={this.props.destinations}
-                field="safety_score"
-                {...props}
-              />
-            )
-          }
-        },
-        {
-          header: () => {
-            return (
-              <SortHeaderCell
-                onSortChange={this.onSortChange}
-                sortDir={this.getSortDir("attractions")}
-                field="attractions"
-              >
-                Attractions
-              </SortHeaderCell>
-            )
-          },
-          label: "Attractions",
-          width: 100,
-          isVisible: true,
-          fixed: false,
-          align: "center",
-          cellContent: (props) => {
-            return (
-              <Cell {...props}>
-                {this.props.destinations[props.rowIndex].attractions}
-              </Cell>
-            )
-          }
-        }
-      ]
+      tableColumns: this.generateTableColumns(tableData)
     }
   }
 
@@ -146,9 +76,129 @@ export default class DataTable extends Component {
     return sort_by[0] == field ? sort_by[1] : null
   }
 
-  onChangeColumnVisibility(checked, column) {
-    const columnIndex = _.findIndex(this.state.tableData, ['header', column]);
-    this.setState({tableData: update(this.state.tableData, {[columnIndex]: {isVisible: {$set: checked}}})});
+  onChangeColumnVisibility(checked, label) {
+    console.log(label);
+    const columnIndex = _.findIndex(this.state.tableColumns, ['label', label]);
+    console.log(columnIndex);
+    this.setState({tableColumns: update(this.state.tableColumns, {[columnIndex]: {isVisible: {$set: checked}}})});
+  }
+
+  applySliderFilter(field, gte, lte, fetchDestinations = true) {
+    const newFilters = {[field]: [`gte;${gte}`, `lte;${lte}`]};
+    //this.setState({filters: {...this.state.filters, ...newFilters}}, this.fetchDestinations);
+    this.props.applyFilters(newFilters, fetchDestinations)
+  }
+
+  getSliderValues(field) {
+    if (this.props.filters[field]) {
+      const filters = this.props.filters[field];
+      var results = {};
+      filters.forEach(filter => {
+        const [operator, value] = filter.split(";");
+        results[operator] = parseFloat(value);
+      });
+      return [results["gte"], results["lte"]]
+    }
+    return null;
+  }
+
+  generateTableColumns(tableData) {
+    return tableData.map(column => {
+      let {label, field, iconName, selectedColor, fixed, align, width, isVisible, sliderMin, sliderMax, sliderStep, contentType, filterType} = column;
+      return {
+        header: label == 'Name' ? '' : () => {
+          switch (filterType) {
+            case "rating":
+              return (
+                <SortHeaderCell
+                  onSortChange={this.onSortChange}
+                  sortDir={this.getSortDir(field)}
+                  field={field}
+                >
+                  {label}
+                  <Ratings
+                    field={field}
+                    iconName={iconName}
+                    interactive={true}
+                    selectedRating={this.props.filters[field] ? parseInt(this.props.filters[field][0].split(";")[1]): null}
+                    applyFilters={this.props.applyFilters}
+                    selectedColor={selectedColor}
+                  />
+                </SortHeaderCell>
+              );
+            case "slider":
+              return (
+                <SortHeaderCell
+                  onSortChange={this.onSortChange}
+                  sortDir={this.getSortDir(field)}
+                  field={field}
+                >
+                  {label}
+                  <div style={{paddingTop: 8}}>
+                    <Rcslider
+                      min={sliderMin}
+                      max={sliderMax}
+                      step={sliderStep}
+                      value={this.getSliderValues(field) || [sliderMin,sliderMax]}
+                      range={true}
+                      onChange={([gte, lte]) => this.applySliderFilter(field, gte, lte, false)}
+                      //defaultValue={[0,1]}
+                      //marks={{1:1, 2:"2", 3: "3", 4: "4", 5:"5", 4.5: ""}}
+                      onAfterChange={([gte, lte]) => this.applySliderFilter(field, gte, lte)}
+                    />
+                  </div>
+                </SortHeaderCell>
+              )
+          }
+        },
+        label: label,
+        width: width || 125,
+        isVisible: isVisible,
+        fixed: fixed,
+        align: align,
+        cellContent: (props) => {
+          switch (contentType) {
+            case "location":
+              return (
+                <Cell {...props}>
+                  <b>{this.props.destinations[props.rowIndex].city_name}</b>
+                  <p style={{fontSize: 11, color: "#989898"}}>{this.props.destinations[props.rowIndex].country_name}</p>
+                </Cell>
+              );
+            case "index":
+              return (
+                <IndexCell
+                  data={this.props.destinations}
+                  field={field}
+                  {...props}
+                />
+              );
+            case "raw":
+              return (
+                <Cell {...props}>
+                  {this.props.destinations[props.rowIndex][field]}
+                </Cell>
+              );
+            case "dollar":
+              return (
+                <Cell {...props}>
+                  ${parseInt(this.props.destinations[props.rowIndex][field])}
+                </Cell>
+              );
+            case "rating":
+              return (
+                <RatingCell
+                  data={this.props.destinations}
+                  field={field}
+                  iconName={iconName}
+                  selectedColor={selectedColor}
+                  {...props}
+                />
+              );
+          }
+        }
+      }
+    })
   }
 
   onSortChange(field) {
@@ -158,38 +208,54 @@ export default class DataTable extends Component {
   }
 
   render() {
+    const { filters, onDismissFilter, destinations } = this.props;
     return (
       <div>
-        <span style={{float: "right"}}><a onClick={() => this.setState({showColumnChooserModal: true})}>Choose
-          columns</a></span>
-        <ColumnChooserModal
-          show={this.state.showColumnChooserModal}
-          onHide={() => this.setState({showColumnChooserModal: false})}
-        >
-          <FormGroup>
-            {this.state.tableData.map((columnData, index) => {
-              return (
-                <Checkbox
-                  checked={columnData.isVisible}
-                  onChange={(e) => this.onChangeColumnVisibility(e.target.checked, columnData.header)}
-                  key={index}
-                >
-                  {columnData.label}
-                </Checkbox>
-              )
-            })
-            }
-          </FormGroup>
-        </ColumnChooserModal>
-
+        <Row>
+          <Col md={10}>
+            {!_.isEmpty(_.omit(filters, ["month", "city_id", "continent", "country_code"])) ?
+              <FilterLabels
+                filters={_.omit(filters, ["month", "city_id", "continent", "country_code"])}
+                onDismissFilter={onDismissFilter}
+              />
+              : null}
+          </Col>
+          <Col md={2}>
+        <span style={{float: "right"}}>
+          <a onClick={() => this.setState({showColumnChooserModal: true})}>
+            Choose columns
+          </a>
+        </span>
+            <ColumnChooserModal
+              show={this.state.showColumnChooserModal}
+              onHide={() => this.setState({showColumnChooserModal: false})}
+            >
+              <FormGroup>
+                {this.state.tableColumns.map((columnData, index) => {
+                  let { isVisible, label } = columnData;
+                  return (
+                    <Checkbox
+                      checked={isVisible}
+                      onChange={(e) => this.onChangeColumnVisibility(e.target.checked, label)}
+                      key={index}
+                    >
+                      {label}
+                    </Checkbox>
+                  )
+                })
+                }
+              </FormGroup>
+            </ColumnChooserModal>
+          </Col>
+        </Row>
         <div style={{width: "100%"}}>
           <Table
-            rowsCount={this.props.destinations.length}
-            rowHeight={50}
-            headerHeight={80}
-            width={1100}
+            rowsCount={destinations.length}
+            rowHeight={60}
+            headerHeight={60}
+            width={1140}
             height={700}>
-            {this.state.tableData.map((columnData, index) => {
+            {this.state.tableColumns.map((columnData, index) => {
               if (columnData.isVisible) {
                 return (
                   <Column

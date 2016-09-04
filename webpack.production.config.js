@@ -51,8 +51,36 @@ module.exports = {
       loader: 'json'
     }, {
       test: /\.css$/,
-      loader: ExtractTextPlugin.extract('style', 'css?modules&localIdentName=[name]---[local]---[hash:base64:5]!postcss')
-    }]
+      loader: "style-loader!css-loader"
+      //loader: ExtractTextPlugin.extract('style', 'css?modules&localIdentName=[name]---[local]---[hash:base64:5]!postcss')
+    },
+      {
+        test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/font-woff"
+      }, {
+        test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/font-woff"
+      }, {
+        test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=application/octet-stream"
+      }, {
+        test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "file"
+      }, {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "url?limit=10000&mimetype=image/svg+xml"
+      }
+    ]
+  },
+  resolve: {
+    alias: {
+      react: path.resolve(__dirname, './node_modules/react'),
+      React: path.resolve(__dirname, './node_modules/react')
+    },
+    fallback: path.resolve(__dirname, './node_modules')
+  },
+  resolveLoader: {
+    fallback: path.resolve(__dirname, './node_modules')
   },
   postcss: [
     require('autoprefixer')

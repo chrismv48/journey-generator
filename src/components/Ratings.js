@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { Glyphicon } from 'react-bootstrap';
 //import Radium from 'radium';
 var Radium = require('radium');
-const GlyphiconStyled = Radium(Glyphicon);
 
 const buildStyles = (interactive, selectedColor, unselectedColor) => {
   if (interactive) {
     return {
       unselected: {
         color: unselectedColor,
+        padding: 1,
         cursor: "pointer",
         ':hover': {
           color: selectedColor
@@ -16,6 +15,7 @@ const buildStyles = (interactive, selectedColor, unselectedColor) => {
       },
       selected: {
         color: selectedColor,
+        padding: 1,
         cursor: "pointer",
         ':hover': {
           color: selectedColor
@@ -26,10 +26,12 @@ const buildStyles = (interactive, selectedColor, unselectedColor) => {
   else {
     return {
       unselected: {
-        color: unselectedColor
+        color: unselectedColor,
+        padding: 1
       },
       selected: {
-        color: selectedColor
+        color: selectedColor,
+        padding: 1
       }
     }
   }
@@ -38,32 +40,33 @@ const buildStyles = (interactive, selectedColor, unselectedColor) => {
 @Radium
 export default class Ratings extends Component {
   static defaultProps = {
-    glyph: "star",
+    iconName: "fa fa-star fa-lg",
     interactive: true,
-    selectedColor: "#e9cd10",
-    unselectedColor: "#aaa",
+    selectedColor: "#E9BD0C",
+    unselectedColor: "#CACACA",
     applyFilters: _.noop,
-    defaultRating: 0
+    staticRating: null,
+    selectedRating: null
   };
   static propTypes = {
     field: React.PropTypes.string.isRequired,
-    glyph: React.PropTypes.string,
+    iconName: React.PropTypes.string,
     interactive: React.PropTypes.bool,
     selectedColor: React.PropTypes.string,
     unselectedColor: React.PropTypes.string,
     applyFilters: React.PropTypes.func,
-    defaultRating: React.PropTypes.number
+    staticRating: React.PropTypes.number,
+    selectedRating: React.PropTypes.number
   };
 
   constructor(props, propTypes, defaultProps) {
     super(props, propTypes, defaultProps);
-
     this.state = {
-      selectedRating: this.props.defaultRating || 0,
+      //selectedRating: 0,
       hoverValue: null
     };
 
-    const {interactive, selectedColor, unselectedColor} = this.props;
+    const {interactive, selectedColor, unselectedColor} = props;
 
     this.styles = buildStyles(interactive, selectedColor, unselectedColor)
 
@@ -71,7 +74,7 @@ export default class Ratings extends Component {
 
 
   handleOnClick(selectedRating) {
-    if (selectedRating == this.state.selectedRating) {
+    if (selectedRating == this.props.selectedRating) {
       this.setState({selectedRating: 0, hoverValue: 0})
     }
     else {
@@ -81,7 +84,7 @@ export default class Ratings extends Component {
   }
 
   getStyle(value) {
-    if (value <= this.state.selectedRating || value <= this.state.hoverValue) {
+    if (value <= this.props.selectedRating || value <= this.state.hoverValue || value <= this.props.staticRating) {
       return this.styles.selected
     }
     else {
@@ -90,30 +93,28 @@ export default class Ratings extends Component {
   }
 
   render() {
-    const { interactive, glyph } = this.props;
+    const { interactive, iconName } = this.props;
     return (
       <div>
-        <h3>
           {[1, 2, 3, 4, 5].map(value => (
               interactive ?
-                <GlyphiconStyled
+                <i
+                  className={iconName}
                   onMouseEnter={() => this.setState({hoverValue: value})}
                   onMouseLeave={() => this.setState({hoverValue: 0})}
                   key={value}
-                  ref="rating"
-                  glyph={glyph}
+                  //ref="rating"
                   onClick={() => this.handleOnClick(value)}
                   style={this.getStyle(value)}
                 />
                 :
-                <GlyphiconStyled
+                <i
+                  className={iconName}
                   key={value}
-                  glyph={glyph}
                   style={this.getStyle(value)}
                 />
             )
           )}
-        </h3>
       </div>
     )
   }

@@ -5,6 +5,7 @@
   "scripts": {
     "test": "",
     "start": "node server",
+    "prod": "NODE_ENV=production PORT=1234 node server",
     "build": "rimraf dist && cross-env NODE_ENV=production webpack --config ./webpack.production.config.js --progress --profile --colors",
     "eslint": "eslint .",
     "jscs": "jscs ."
@@ -42,6 +43,8 @@
     "cross-env": "^2.0.1",
     "css-loader": "^0.24.0",
     "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome": "^4.6.3",
     "html-webpack-plugin": "^2.22.0",
     "jscs": "^3.0.7",
     "jsdom": "^9.4.5",
@@ -50,6 +53,7 @@
     "radium": "^0.18.1",
     "react-transform-hmr": "^1.0.4",
     "stats-webpack-plugin": "^0.4.2",
-    "style-loader": "^0.13.1"
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7"
   }
 }
