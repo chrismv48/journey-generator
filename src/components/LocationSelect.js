@@ -61,7 +61,8 @@ export default class LocationSelect extends Component {
 
   render() {
     return (
-        <h4 style={{marginTop:24}}>
+      <div style={{marginTop:24}}>
+        <b>
           <Select.Async
             name="location-select"
             simpleValue
@@ -72,7 +73,8 @@ export default class LocationSelect extends Component {
             multi
             placeholder="Filter by cities, countries, or continents!"
           />
-        </h4>
+        </b>
+      </div>
     )
   }
 }

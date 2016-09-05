@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Column, Cell} from 'fixed-data-table';
-import { Checkbox, FormGroup, Button, Row, Col } from 'react-bootstrap';
+import { Checkbox, FormGroup, Button, Row, Col, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import update from 'react-addons-update';
 import _ from 'lodash';
 import ColumnChooserModal from './ColumnChooserModal';
@@ -27,13 +27,23 @@ class IndexCell extends Component {
 
 class SortHeaderCell extends Component {
   render() {
-    var {onSortChange, field, sortDir, children, ...props} = this.props;
+    var {onSortChange, field, tooltipMsg, sortDir, children, ...props} = this.props;
     let [label, filter] = React.Children.toArray(children);
+    const tooltip = (
+      <Tooltip id={field}>{tooltipMsg}</Tooltip>
+    );
     return (
       <Cell {...props}>
-        <a onClick={() => onSortChange(field)}>
-          {label} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
-        </a>
+        {tooltipMsg ?
+          <OverlayTrigger placement="top" overlay={tooltip}>
+            <a style={{cursor:"pointer"}} onClick={() => onSortChange(field)}>
+              {label} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
+            </a>
+          </OverlayTrigger>
+          :
+          <a style={{cursor:"pointer"}} onClick={() => onSortChange(field)}>
+            {label} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
+          </a>}
         {filter}
       </Cell>
     )
@@ -84,6 +94,7 @@ export default class DataTable extends Component {
   }
 
   applySliderFilter(field, gte, lte, fetchDestinations = true) {
+    console.log(`applying slider filter: ${field}`);
     const newFilters = {[field]: [`gte;${gte}`, `lte;${lte}`]};
     //this.setState({filters: {...this.state.filters, ...newFilters}}, this.fetchDestinations);
     this.props.applyFilters(newFilters, fetchDestinations)
@@ -104,7 +115,9 @@ export default class DataTable extends Component {
 
   generateTableColumns(tableData) {
     return tableData.map(column => {
-      let {label, field, iconName, selectedColor, fixed, align, width, isVisible, sliderMin, sliderMax, sliderStep, contentType, filterType} = column;
+      let {label, field, iconName, tooltipMsg, selectedColor, fixed, align,height, width, isVisible, sliderMin, sliderMax, sliderStep, contentType, filterType} = column;
+      width = width || 125;
+      height = height || 60;
       return {
         header: label == 'Name' ? '' : () => {
           switch (filterType) {
@@ -114,6 +127,9 @@ export default class DataTable extends Component {
                   onSortChange={this.onSortChange}
                   sortDir={this.getSortDir(field)}
                   field={field}
+                  width={width}
+                  height={height}
+                  tooltipMsg={tooltipMsg}
                 >
                   {label}
                   <Ratings
@@ -132,9 +148,12 @@ export default class DataTable extends Component {
                   onSortChange={this.onSortChange}
                   sortDir={this.getSortDir(field)}
                   field={field}
+                  width={width}
+                  height={height}
+                  tooltipMsg={tooltipMsg}
                 >
                   {label}
-                  <div style={{paddingTop: 8}}>
+                  <div style={{padding: 8}}>
                     <Rcslider
                       min={sliderMin}
                       max={sliderMax}
@@ -152,7 +171,7 @@ export default class DataTable extends Component {
           }
         },
         label: label,
-        width: width || 125,
+        width: width,
         isVisible: isVisible,
         fixed: fixed,
         align: align,
@@ -183,6 +202,12 @@ export default class DataTable extends Component {
               return (
                 <Cell {...props}>
                   ${parseInt(this.props.destinations[props.rowIndex][field])}
+                </Cell>
+              );
+            case "integer":
+              return (
+                <Cell {...props}>
+                  {parseInt(this.props.destinations[props.rowIndex][field])}
                 </Cell>
               );
             case "rating":
@@ -254,7 +279,7 @@ export default class DataTable extends Component {
             rowHeight={60}
             headerHeight={60}
             width={1140}
-            height={700}>
+            height={600}>
             {this.state.tableColumns.map((columnData, index) => {
               if (columnData.isVisible) {
                 return (

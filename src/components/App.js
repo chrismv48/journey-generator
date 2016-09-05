@@ -30,8 +30,8 @@ export default class App extends Component {
     this.state = {
       destinations: [],
       filters: {month: ["eq;" + months[(new Date).getMonth() + 1].toLowerCase()]},
-      locationValue: "",
-      sort_by: ["safety_score", "desc"]
+      sort_by: ["safety_score_label", "desc"],
+      isLoading: false
     };
 
     this.applyFilters = this.applyFilters.bind(this);
@@ -49,10 +49,11 @@ export default class App extends Component {
     const sortByQS = {sort_by: this.state.sort_by[0] + '.' + this.state.sort_by[1]};
     const querystring = qs.stringify({...this.state.filters, ...sortByQS},
       {arrayFormat: 'repeat'});
+    this.setState({isLoading: true});
     fetch('http://127.0.0.1:5000/destinations' + '?' + querystring).then((response) => {
       return response.json()
     }).then((response_json) => {
-      this.setState({destinations: response_json.destinations});
+      this.setState({destinations: response_json.destinations, isLoading: false});
     })
   }
 
@@ -83,48 +84,53 @@ export default class App extends Component {
 
   render() {
     return (
-        <Grid>
-          <h1>Journey Generator</h1>
-          <Row>
-            <Col md={6}>
-              <LocationSelect
-                locationFilters={_.pick(this.state.filters, ["city_id", "country_code", "continent"])}
-                applyFilters={this.applyFilters}
-              />
-            </Col>
-            <Col md={2}>
-                <FormGroup controlId="formControlsSelect">
-                  <ControlLabel>Month</ControlLabel>
-                  <FormControl componentClass="select"
-                               placeholder="select"
-                               value={this.state.filters.month[0].split(';')[1]}
-                               onChange={(e) => this.onMonthSelectChange(e.target.value)}
-                  >
-                    {months.map(month => (
-                      <option
-                        value={month.toLowerCase()}
-                        key={month}
-                      >
-                        {month}
-                      </option>
-
-                    ))}
-                  </FormControl>
-                </FormGroup>
-            </Col>
-          </Row>
-
-          {!_.isEmpty(this.state.destinations) ?
-            <DataTable
-              applySortBy={this.applySortBy}
-              destinations={this.state.destinations}
+      <Grid>
+        <h1>Journey Generator</h1>
+        <Row>
+          <Col md={6}>
+            <LocationSelect
+              locationFilters={_.pick(this.state.filters, ["city_id", "country_code", "continent"])}
               applyFilters={this.applyFilters}
-              sort_by={this.state.sort_by}
-              filters={this.state.filters}
-              onDismissFilter={this.onDismissFilter}
             />
-            : null}
-        </Grid>
+          </Col>
+          <Col md={2}>
+            <FormGroup controlId="formControlsSelect">
+              <ControlLabel>Month</ControlLabel>
+              <FormControl componentClass="select"
+                           placeholder="select"
+                           value={this.state.filters.month[0].split(';')[1]}
+                           onChange={(e) => this.onMonthSelectChange(e.target.value)}
+              >
+                {months.map(month => (
+                  <option
+                    value={month.toLowerCase()}
+                    key={month}
+                  >
+                    {month}
+                  </option>
+
+                ))}
+              </FormControl>
+            </FormGroup>
+          </Col>
+        </Row>
+        <div style={this.state.isLoading ? {opacity:0.5} : null}>
+          {this.state.isLoading? <h3 style={{position: "absolute",
+          zIndex: 10,
+          left: "50%",
+          top: "40%"}}>
+            Loading...
+          </h3>: null}
+          <DataTable
+            applySortBy={this.applySortBy}
+            destinations={this.state.destinations}
+            applyFilters={this.applyFilters}
+            sort_by={this.state.sort_by}
+            filters={this.state.filters}
+            onDismissFilter={this.onDismissFilter}
+          />
+        </div>
+      </Grid>
     );
   }
 };

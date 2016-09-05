@@ -10,30 +10,18 @@ var tableData = [
     width: 110
   },
   {
-    field: "population_label",
-    label: "Population",
-    align: "center",
-    sortable: true,
-    contentType: "rating",
-    filterType: "rating",
-    sliderMin: 0,
-    sliderMax: 300,
-    sliderStep: 10,
-    fixed: false,
-    isVisible: true
-  },
-  {
     field: "avg_price",
     label: "Avg Daily Price",
     align: "center",
     sortable: true,
     contentType: "dollar",
     filterType: "slider",
-    sliderMin: 0,
+    sliderMin: 1,
     sliderMax: 300,
     sliderStep: 10,
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: 'The estimated average daily cost of living in the location assuming average accommodations.'
   },
   {
     field: "weather_index_label",
@@ -47,18 +35,77 @@ var tableData = [
     sliderMax: 1,
     sliderStep: 0.1,
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: "Ideal weather is an avg temp of 75, low humidity and little rain/cloud coverage."
+  },
+  {
+    field: "low_temp",
+    label: "Avg Low Temp",
+    align: "center",
+    sortable: true,
+    contentType: "integer",
+    filterType: "slider",
+    iconName: "fa fa-sun-o fa-lg",
+    sliderMin: -50,
+    sliderMax: 100,
+    sliderStep: 5,
+    fixed: false,
+    isVisible: false
+  },
+  {
+    field: "high_temp",
+    label: "Avg High Temp",
+    align: "center",
+    sortable: true,
+    contentType: "integer",
+    filterType: "slider",
+    iconName: "fa fa-sun-o fa-lg",
+    sliderMin: -50,
+    sliderMax: 100,
+    sliderStep: 5,
+    fixed: false,
+    isVisible: false
   },
   {
     field: "safety_score_label",
-    label: "Safety Score",
+    label: "Safety",
     align: "center",
     sortable: true,
     contentType: "rating",
     filterType: "rating",
     iconName: "fa fa-hand-peace-o fa-lg",
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    selectedColor: "#e600e6",
+    tooltipMsg: 'Calculated using crime statistics'
+  },
+  {
+    field: "environment_score_label",
+    label: "Environment",
+    align: "center",
+    sortable: true,
+    contentType: "rating",
+    filterType: "rating",
+    iconName: "fa fa-tree fa-lg",
+    selectedColor: "#009900",
+    fixed: false,
+    isVisible: true,
+    tooltipMsg: 'Calculated from surveys about location cleanliness, access to parks, and overall pollution levels.'
+  },
+  {
+    field: "population_label",
+    label: "Population",
+    align: "center",
+    sortable: true,
+    contentType: "rating",
+    filterType: "slider",
+    sliderMin: 1,
+    sliderMax: 5,
+    sliderStep: 1,
+    iconName: "fa fa-building fa-lg",
+    selectedColor: "#666666",
+    fixed: false,
+    isVisible: false
   },
   {
     field: "attractions_score",
@@ -70,7 +117,8 @@ var tableData = [
     selectedColor: "#0588f9",
     iconName: "fa fa-camera-retro fa-lg",
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: "Calculated based on the number of amusement parks, aquariums, stadiums, parks, and zoos."
   },
   {
     field: "culture_score",
@@ -82,7 +130,8 @@ var tableData = [
     selectedColor: "#56ab56",
     iconName: "fa fa-globe fa-lg",
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: "Calculated based on the number of museums and art galleries."
   },
   {
     field: "dining_score",
@@ -94,7 +143,8 @@ var tableData = [
     selectedColor: "#f9a126",
     iconName: 'fa fa-cutlery fa-lg',
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: "Calculated based on the number of cafes and restaurants."
   },
   {
     field: "nightlife_score",
@@ -106,7 +156,8 @@ var tableData = [
     selectedColor: "#d9534f",
     iconName: 'fa fa-glass fa-lg',
     fixed: false,
-    isVisible: true
+    isVisible: true,
+    tooltipMsg: "Calculated based on the number of bars and night clubs."
   },
   {
     field: "shopping_score",
@@ -118,7 +169,8 @@ var tableData = [
     selectedColor: "#a742a9",
     iconName: 'fa fa-shopping-bag fa-lg',
     fixed: false,
-    isVisible: true
+    isVisible: false,
+    tooltipMsg: "Calculated based on the number of department stores and shopping malls."
   }
 ];
 

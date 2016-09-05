@@ -5,33 +5,6 @@
 .Select-menu-outer {
     z-index: 999 !important;
 }
-
-.rating_selection {
-    text-align: center;
-}
-.rating_selection label:first-of-type {
-    display: none;
-}
-.rating_selection input[type='radio'],
-.rating_selection span {
-    display: none;
-}
-.rating_selection label {
-    cursor: pointer;
-}
-.rating_selection label:before {
-    display: inline-block;
-    content: "&#x26A1";
-    font-size: 80px;
-    letter-spacing: 10px;
-    color: #e9cd10;
-}
-.rating_selection input:checked + label ~ label:before {
-    color: #aaa;
-}
-.rating_selection:hover label[for]:before {
-    color: #e9cd10;
-}
-.rating_selection:hover label:hover ~ label:before {
-    color: #aaa;
+.rc-tooltip {
+    z-index: 10;
 }
