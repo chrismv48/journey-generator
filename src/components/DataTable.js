@@ -10,6 +10,8 @@ import Ratings from './Ratings';
 import tableData from './TableData'
 require('rc-slider/assets/index.css');
 var Rcslider = require('rc-slider');
+import DestinationLinks from './DestinationLinks';
+
 
 class IndexCell extends Component {
   render() {
@@ -44,7 +46,9 @@ class SortHeaderCell extends Component {
           <a style={{cursor:"pointer"}} onClick={() => onSortChange(field)}>
             {label} {sortDir ? (sortDir === 'desc' ? '↓' : '↑') : ''}
           </a>}
-        {filter}
+        <div style={{paddingTop: 4}}>
+          {filter}
+        </div>
       </Cell>
     )
   }
@@ -87,16 +91,12 @@ export default class DataTable extends Component {
   }
 
   onChangeColumnVisibility(checked, label) {
-    console.log(label);
     const columnIndex = _.findIndex(this.state.tableColumns, ['label', label]);
-    console.log(columnIndex);
     this.setState({tableColumns: update(this.state.tableColumns, {[columnIndex]: {isVisible: {$set: checked}}})});
   }
 
   applySliderFilter(field, gte, lte, fetchDestinations = true) {
-    console.log(`applying slider filter: ${field}`);
     const newFilters = {[field]: [`gte;${gte}`, `lte;${lte}`]};
-    //this.setState({filters: {...this.state.filters, ...newFilters}}, this.fetchDestinations);
     this.props.applyFilters(newFilters, fetchDestinations)
   }
 
@@ -117,7 +117,7 @@ export default class DataTable extends Component {
     return tableData.map(column => {
       let {label, field, iconName, tooltipMsg, selectedColor, fixed, align,height, width, isVisible, sliderMin, sliderMax, sliderStep, contentType, filterType} = column;
       width = width || 125;
-      height = height || 60;
+      height = height || 90;
       return {
         header: label == 'Name' ? '' : () => {
           switch (filterType) {
@@ -182,6 +182,11 @@ export default class DataTable extends Component {
                 <Cell {...props}>
                   <b>{this.props.destinations[props.rowIndex].city_name}</b>
                   <p style={{fontSize: 11, color: "#989898"}}>{this.props.destinations[props.rowIndex].country_name}</p>
+                  <DestinationLinks
+                    tripadvisorLink={this.props.destinations[props.rowIndex].tripadvisor_link}
+                    city_name={this.props.destinations[props.rowIndex].city_name}
+                    country_name={this.props.destinations[props.rowIndex].country_name}
+                  />
                 </Cell>
               );
             case "index":
@@ -237,7 +242,7 @@ export default class DataTable extends Component {
     return (
       <div>
         <Row>
-          <Col md={10}>
+          <Col sm={10}>
             {!_.isEmpty(_.omit(filters, ["month", "city_id", "continent", "country_code"])) ?
               <FilterLabels
                 filters={_.omit(filters, ["month", "city_id", "continent", "country_code"])}
@@ -245,7 +250,7 @@ export default class DataTable extends Component {
               />
               : null}
           </Col>
-          <Col md={2}>
+          <Col sm={2}>
         <span style={{float: "right"}}>
           <a onClick={() => this.setState({showColumnChooserModal: true})}>
             Choose columns
@@ -276,8 +281,8 @@ export default class DataTable extends Component {
         <div style={{width: "100%"}}>
           <Table
             rowsCount={destinations.length}
-            rowHeight={60}
-            headerHeight={60}
+            rowHeight={90}
+            headerHeight={80}
             width={1140}
             height={600}>
             {this.state.tableColumns.map((columnData, index) => {

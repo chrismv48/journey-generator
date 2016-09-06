@@ -5,7 +5,7 @@ import { Button } from 'react-bootstrap';
 import _ from 'lodash';
 
 const getLocationOptions = () => {
-  return fetch('http://127.0.0.1:5000/locations')
+  return fetch('http://localhost:5000/locations')
     .then((response) => {
       return response.json();
     }).then((json) => {
@@ -26,7 +26,6 @@ export default class LocationSelect extends Component {
       continent: null,
       country_code: null
     };
-    console.log(locationFilters);
     this.props.applyFilters(locationFilters);
   }
 

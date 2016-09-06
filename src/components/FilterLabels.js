@@ -15,11 +15,9 @@ const FilterLabels = ({filters, onDismissFilter}) => {
   const labels = _.keys(filters).map(field => {
     var op_values = filters[field];
     const label = _.find(tableData, ['field', field]).label;
-    console.log(label);
     return op_values.map(op_value => {
         var [operator, values] = op_value.split(";");
         operator = _.get(operatorMapping, operator, operator);
-        console.log(operator);
         return (
           <span style={{padding: 3}}>
             <Label bsStyle="primary">{label} {operator} {values}

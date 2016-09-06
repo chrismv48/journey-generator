@@ -7,7 +7,7 @@ var tableData = [
     contentType: "location",
     fixed: true,
     isVisible: true,
-    width: 110
+    width: 120
   },
   {
     field: "avg_price",
